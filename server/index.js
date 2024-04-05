@@ -8,19 +8,21 @@ app.use(cors());
 app.use(express.json());
 
 
-const HOST = process.env.HOST;
-const APPUSER = process.env.APPUSER;
-const PASSWORD = process.env.PASSWORD;
 const PORT = process.env.PORT;
+const DB_IP = process.env.DB_IP;
+const DB_NAME = process.env.DB_NAME;
+const DB_USER = process.env.DB_USER;
+const DB_PASSWORD = process.env.DB_PASSWORD;
 
-console.log("hello", APPUSER, PASSWORD, PORT);
+console.log("hello", DB_IP, DB_NAME, DB_USER, DB_PASSWORD, PORT);
+
 
 
 const db = mysql.createConnection({
-  host: {HOST},
-  user: 'root',
-  password: "Deep@2002",
-  database: "btp1",
+  host: `${DB_IP}`,
+  database: `${DB_NAME}`,
+  user: `${DB_USER}`,
+  password: `${DB_PASSWORD}`,
 });
 
 app.get("/entries", (req, res) => {
