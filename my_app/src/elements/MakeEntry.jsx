@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import BASE_URL from "../apiConfig";
+import CustomButton from "../customUI/CustomButton";
 
 function MakeEntry() {
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   const [value, setValue] = useState();
-
-  const navigate = useNavigate();
 
   function handleIn(e) {
     e.preventDefault();
@@ -16,7 +14,7 @@ function MakeEntry() {
       entry_type: "IN",
     };
     axios
-      .post(`${BASE_URL}/make_entry`, requestBody)
+      .post(`${process.env.REACT_APP_BASE_URL}/make_entry`, requestBody)
       .then((res) => {
         console.log("Server Response ", res);
       })
@@ -39,15 +37,16 @@ function MakeEntry() {
   }
 
   return (
-    <div>
+    <div className="text-center">
       Make a entry
       <input
+        className="p-2 rounded-md text-lg"
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
-      <button onClick={handleIn}>In</button>
-      <button onClick={handleOut}>Out</button>
+      <CustomButton onClick={handleIn}>In</CustomButton>
+      <CustomButton onClick={handleOut}>Out</CustomButton>
     </div>
   );
 }

@@ -1,8 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import BASE_URL from "../apiConfig";
 // import { Link } from 'react-router-dom'
-
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 function Entries() {
   const [data, setData] = useState([]);
 
@@ -31,7 +30,7 @@ function Entries() {
       second: "numeric",
     };
 
-    return format == "date"
+    return format === "date"
       ? date.toLocaleDateString("en-IN", dateOptions)
       : date.toLocaleString("en-IN", timeOptions);
 
@@ -51,25 +50,31 @@ function Entries() {
   };
 
   return (
-    <div>
-      <h3>Entries of the Vehicle</h3>
-      <table>
-        <thead>
+    <div className="flex flex-col items-center">
+      <h2 className="p-4">Entries of the Vehicle</h2>
+      <table className="p-2">
+        <thead className="bg-slate-700 text-white">
           <tr>
-            <th>Vehicle Number</th>
-            <th colSpan="2">Entry</th>
+            <th className="p-4" rowSpan={2}>
+              S.No.
+            </th>
+            <th className="p-4" rowSpan={2}>
+              Vehicle Number
+            </th>
+            <th className="p-6" colSpan="2">
+              Entry
+            </th>
             <th colSpan="2">Exit</th>
           </tr>
           <tr>
-            <th></th>
-            <th>Date</th>
+            <th className="p-4">Date</th>
             <th>Time</th>
             <th>Date</th>
             <th>Time</th>
           </tr>
         </thead>
         <tbody>
-          {data.map((entry) => {
+          {data.map((entry, index) => {
             // Parse entry_time string into a Date object
             const entryTime = new Date(entry.entry_time);
             const exitTime = entry.exit_time ? new Date(entry.exit_time) : "";
@@ -79,12 +84,13 @@ function Entries() {
             const exitTimeString = formatDate(exitTime, "time");
 
             return (
-              <tr key={entry.id}>
-                <td>{entry.vehicle_no}</td>
-                <td>{entryDate}</td>
-                <td>{entryTimeString}</td>
-                <td>{exitDate}</td>
-                <td>{exitTimeString}</td>
+              <tr className="bg-slate-300 text-center" key={entry.id}>
+                <td className="p-4 px-10 border">{index + 1}</td>
+                <td className="p-4 px-10 border">{entry.vehicle_no}</td>
+                <td className="p-4 px-10 border">{entryDate}</td>
+                <td className="p-4 px-10 border">{entryTimeString}</td>
+                <td className="p-4 px-10 border">{exitDate}</td>
+                <td className="p-4 px-10 border">{exitTimeString}</td>
               </tr>
             );
           })}

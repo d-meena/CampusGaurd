@@ -7,10 +7,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const port = 8000;
+
+const HOST = process.env.HOST;
+const APPUSER = process.env.APPUSER;
+const PASSWORD = process.env.PASSWORD;
+const PORT = process.env.PORT;
+
+console.log("hello", APPUSER, PASSWORD, PORT);
+
+
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
+  host: {HOST},
+  user: 'root',
   password: "Deep@2002",
   database: "btp1",
 });
@@ -114,6 +122,6 @@ app.get("/entries/:vehicle_no", (req, res) => {
 //     });
 //   });
 
-app.listen(port, () => {
-  console.log(`listening on port ${port} `);
+app.listen(PORT, () => {
+  console.log(`listening on PORT ${PORT} `);
 });
