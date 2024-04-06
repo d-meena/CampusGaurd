@@ -9,6 +9,7 @@ function Home() {
 
   const [value, setValue] = useState("");
 
+
   function handleIn(e) {
     e.preventDefault();
     console.log("handling in");
@@ -51,9 +52,6 @@ function Home() {
         <CustomButton type={1} onClick={() => setIsMakeEntryOpen(true)}>
           Make an entry
         </CustomButton>
-        {/* <CustomButton type={1} onClick={() => navigate("/make_entry")}>
-          Make an entry
-        </CustomButton> */}
       </div>
       {isMakeEntryOpen && (
         <>

@@ -33,20 +33,6 @@ function Entries() {
     return format === "date"
       ? date.toLocaleDateString("en-IN", dateOptions)
       : date.toLocaleString("en-IN", timeOptions);
-
-    // const day = date.getUTCDate();
-    // const month = date.getUTCMonth() + 1;
-    // const year = date.getUTCFullYear();
-    // const hours = date.getUTCHours();
-    // const minutes = date.getUTCMinutes();
-
-    // const pad = (num) => (num < 10 ? "0" + num : num);
-
-    // if (format === 'date') {
-    //   return `${pad(day)}-${pad(month)}-${year}`;
-    // } else if (format === 'time') {
-    //   return `${pad(hours)}:${pad(minutes)}`;
-    // }
   };
 
   return (
