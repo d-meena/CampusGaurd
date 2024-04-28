@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
+import { toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 import CustomButton from "../customUI/CustomButton";
 
 function Home() {
@@ -9,10 +13,19 @@ function Home() {
 
   const [value, setValue] = useState("");
 
+  function checkNo(vehicle_no) {
+    return vehicle_no.length >= 3 && vehicle_no.length <= 10;
+  }
 
   function handleIn(e) {
     e.preventDefault();
     console.log("handling in");
+    if (!checkNo(value)) {
+      // toast.configure();
+      console.log("enter");
+      toast("please enter a valid no");
+      return;
+    }
     const requestBody = {
       vehicle_no: value.toUpperCase(),
       entry_type: "IN",
@@ -20,14 +33,27 @@ function Home() {
     axios
       .post(`${process.env.REACT_APP_BASE_URL}/make_entry`, requestBody)
       .then((res) => {
-        console.log("Server Response ", res);
+        // console.log("Server Response ", res);
+        toast(res.data.message);
+        if (res.data.success) {
+          setIsMakeEntryOpen(false);
+          setValue("");
+        }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        toast("err");
+      });
   }
 
   function handleOut(e) {
     e.preventDefault();
     console.log("handling out");
+
+    if (!checkNo(value)) {
+      toast("please enter a valid no");
+      return;
+    }
     const requestBody = {
       vehicle_no: value.toUpperCase(),
       entry_type: "OUT",
@@ -35,9 +61,16 @@ function Home() {
     axios
       .post(`${process.env.REACT_APP_BASE_URL}/make_entry`, requestBody)
       .then((res) => {
-        console.log("Server Response ", res);
+        // console.log("Server Response ", res);
+        toast(res.data.message);
+        if (res.data.success) {
+          setIsMakeEntryOpen(false);
+          setValue("");
+        }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   return (

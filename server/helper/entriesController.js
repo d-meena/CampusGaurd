@@ -1,28 +1,57 @@
 const db = require("./dbController"); // Replace 'yourDbModule' with the module that handles your database connection
 
+function FormatDateTime(givenTime) {
+  givenTime = new Date(givenTime);
+  console.log(givenTime, " givenTime");
+  const tzo = givenTime.getTimezoneOffset();
+  const tzo_in_ms = tzo * 60 * 1000;
+  const parsed_time_with_tzo = givenTime.getTime() - tzo_in_ms;
+  const parsed_datetime = new Date(parsed_time_with_tzo)
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+  return parsed_datetime;
+}
+
 async function getEntries(req, res) {
   const defaultPage = 1;
-  const defaultLimit = 10;
+  const defaultLimit = 20;
 
-  const { page = defaultPage, limit = defaultLimit } = req.query;
+  console.log("req query = ", req.query); // why this is logging 2 times?
 
+  const {
+    page = defaultPage,
+    limit = defaultLimit,
+    vehicle_no,
+    startDateISO = null,
+    endDateISO = new Date(),
+  } = req.query;
+  const searchNo = "%" + vehicle_no + "%";
+  console.log(vehicle_no, "  vehicle_no");
   const offset = (page - 1) * limit;
+  const startDate = startDateISO !== null ? FormatDateTime(startDateISO) : null;
+  const endDate = FormatDateTime(endDateISO);
+  console.log(startDate, " ", endDate);
 
-  const get_query = `SELECT * FROM entry ORDER BY entry_time DESC LIMIT ${limit} OFFSET ${offset}`;
-  const page_query = `SELECT CEIL(COUNT(*)/${limit}) AS total_pages FROM entry`;
+  const get_query = `SELECT * FROM entry where vehicle_no like "${searchNo}" ORDER BY entry_time DESC LIMIT ${limit} OFFSET ${offset}`;
+  const get_query_date = `SELECT * FROM entry where vehicle_no like "${searchNo}" and entry_time >= "${startDate}" AND (exit_time <= "${endDate}" or exit_time is null) ORDER BY entry_time DESC LIMIT ${limit} OFFSET ${offset}`;
+  const page_query = `SELECT CEIL(COUNT(*)/${limit}) AS total_pages FROM entry where vehicle_no LIKE "${searchNo}"`;
+  const page_query_date = `SELECT CEIL(COUNT(*)/${limit}) AS total_pages FROM entry where vehicle_no LIKE "${searchNo}" and entry_time >= "${startDate}" AND (exit_time <= "${endDate}" or exit_time is null)`;
 
-  db.query(page_query, (err, total_pages) => {
-    if (err) res.json({ message: "Server error", error: err });
-    db.query(get_query, (err, result) => {
+  db.query(
+    startDate !== null ? page_query_date : page_query,
+    (err, total_pages) => {
       if (err) res.json({ message: "Server error", error: err });
-      pagination = {
-        page: page,
-        limit: limit,
-        total_pages: total_pages[0].total_pages,
-      };
-      return res.json({ result, pagination });
-    });
-  });
+      const totalPages = total_pages[0].total_pages;
+      db.query(
+        startDate !== null ? get_query_date : get_query,
+        (err, result) => {
+          if (err) res.json({ message: "Server error", error: err });
+          return res.json({ result, totalPages });
+        }
+      );
+    }
+  );
 }
 
 function makeEntry(req, res) {
@@ -30,14 +59,7 @@ function makeEntry(req, res) {
   const { vehicle_no, entry_type } = req.body;
 
   // format current time to mysql datetime
-  const current_time = new Date();
-  const tzo = current_time.getTimezoneOffset();
-  const tzo_in_ms = tzo * 60 * 1000;
-  const current_time_with_tzo = current_time - tzo_in_ms;
-  const current_datetime = new Date(current_time_with_tzo)
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
+  const current_datetime = FormatDateTime(new Date());
   const query_vehicle = `select vehicle_no from entry where vehicle_no = "${vehicle_no}" and exit_time is NULL`;
 
   db.query(query_vehicle, (err, result) => {

@@ -1,88 +1,92 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-// import { Link } from 'react-router-dom'
+import ReactPaginate from "react-paginate";
+import CustomTable from "../customUI/CustomTable";
+import SearchBar from "../customUI/SearchBar";
+import moment from 'moment';
+// import CustomPagination from "../customUI/CustomPagination";
+
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 function Entries() {
-  const [data, setData] = useState([]);
-
+  console.log("running"); // why this is logging 4 times?
+  const [searchNo, setSearchNo] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 6;
+  const offset = (page - 1) * limit;
+  // console.log(offset);
   useEffect(() => {
     axios
-      .get(`${BASE_URL}/entries`)
+      .get(`${BASE_URL}/entries`, {
+        params: {
+          page: page,
+          limit: limit,
+          vehicle_no: searchNo,          
+          startDateISO: startDate !== null ? moment(startDate).toISOString() : null,
+          endDateISO: endDate !== null ? moment(endDate).toISOString() : null,
+        },
+      })
       .then((res) => {
-        console.log(res);
-        setData(res.data);
-        console.log(res);
+        setData(res.data.result);
+        setTotalPages(res.data.totalPages);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [page]);
+  const [data, setData] = useState([]);
 
-  const formatDate = (date, format) => {
-    if (!date) return "Not Done";
-    const dateOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
-    const timeOptions = {
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-    };
-
-    return format === "date"
-      ? date.toLocaleDateString("en-IN", dateOptions)
-      : date.toLocaleString("en-IN", timeOptions);
+  const handlePageClick = (event) => {
+    setPage(event.selected + 1);
   };
 
-  return (
-    <div className="flex flex-col items-center">
-      <h2 className="p-4">Entries of the Vehicle</h2>
-      <table className="p-2">
-        <thead className="bg-slate-700 text-white">
-          <tr>
-            <th className="p-4" rowSpan={2}>
-              S.No.
-            </th>
-            <th className="p-4" rowSpan={2}>
-              Vehicle Number
-            </th>
-            <th className="p-6" colSpan="2">
-              Entry
-            </th>
-            <th colSpan="2">Exit</th>
-          </tr>
-          <tr>
-            <th className="p-4">Date</th>
-            <th>Time</th>
-            <th>Date</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((entry, index) => {
-            // Parse entry_time string into a Date object
-            const entryTime = new Date(entry.entry_time);
-            const exitTime = entry.exit_time ? new Date(entry.exit_time) : "";
-            const entryDate = formatDate(entryTime, "date");
-            const entryTimeString = formatDate(entryTime, "time");
-            const exitDate = formatDate(exitTime, "date");
-            const exitTimeString = formatDate(exitTime, "time");
+  function handleSearch(e) {
+    e.preventDefault();
+    console.log("handling Search");
+    console.log(searchNo, " searchNo")
+    console.log(startDate, " ", endDate)
+    axios
+      .get(`${BASE_URL}/entries`, {
+        params: {
+          page: 1,
+          limit: limit,
+          vehicle_no: searchNo,
+          startDateISO: startDate !== null ? moment(startDate).toISOString() : null,
+          endDateISO: endDate !== null ? moment(endDate).toISOString() : null,
+        },
+      })
+      .then((res) => {
+        setData(res.data.result);
+        setTotalPages(res.data.totalPages);
+      })
+      .catch((err) => console.log(err));
+  }
 
-            return (
-              <tr className="bg-slate-300 text-center" key={entry.id}>
-                <td className="p-4 px-10 border">{index + 1}</td>
-                <td className="p-4 px-10 border">{entry.vehicle_no}</td>
-                <td className="p-4 px-10 border">{entryDate}</td>
-                <td className="p-4 px-10 border">{entryTimeString}</td>
-                <td className="p-4 px-10 border">{exitDate}</td>
-                <td className="p-4 px-10 border">{exitTimeString}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+  return (
+    <>
+      <h2 className="p-4 flex items-end">Entries of the Vehicle</h2>
+      <SearchBar
+        onClick={handleSearch}
+        searchNo={searchNo}
+        setSearchNo={setSearchNo}
+        startDate = {startDate}
+        setStartDate = {setStartDate}
+        endDate = {endDate}
+        setEndDate = {setEndDate}
+      />
+      <CustomTable data={data} offset={offset}></CustomTable>
+      <ReactPaginate
+        className="flex flex-row  gap-3 "
+        breakLabel="..."
+        pageRangeDisplayed={2}
+        onPageChange={handlePageClick}
+        pageCount={totalPages}
+        previousLabel="< prev"
+        nextLabel="next >"
+      />
+      {/* <CustomPagination totalPages={totalPages} /> */}
+    </>
   );
 }
 
