@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 from skimage.segmentation import clear_border
 import pytesseract
 import imutils
@@ -9,8 +10,6 @@ from PIL import Image
 from collections import Counter
 
 def find_licensePlate(plate_roi):
-    # plate_roi = frame[y:y+h, x:x+w]
-
     # Convert to grayscale
     gray_image = cv2.cvtColor(plate_roi, cv2.COLOR_BGR2GRAY)
 
@@ -44,16 +43,7 @@ def read_image(plate_roi, psm=7):
     lptext = pytesseract.image_to_string(plate_roi, config=options)
     return lptext
 
-# def remove_extra_characters(string):
-#     result = ""
-#     for c in string:
-#         if c.isalnum():
-#             result += c
-#     return result
-
-
 def modify_no(vehicle_no):
-    # calling remove function equalance
     vehicle_no = ''.join(c for c in vehicle_no if c.isalnum())
     vehicle_no = vehicle_no.upper()
 
@@ -124,11 +114,8 @@ def convert_to_digit(vehicle_no, i):
 valid_state_code = {'AN', 'AP', 'AR', 'AS', 'BR', 'CG', 'CH', 'DD', 'DL', 'DN', 'GA', 'GJ', 'HP', 'HR', 'JH', 'JK', 'KA', 'KL',
                     'LA', 'LD', 'MH', 'ML', 'MN', 'MP', 'MZ', 'NL', 'OD', 'OR', 'OT', 'PB', 'PY', 'RJ', 'SK', 'TN', 'TR', 'TS', 'UA', 'UK', 'UP', 'WB'}
 
-# Valid number plate
-
 
 def valid_number_plate(num):
-    # num = remove(num)  ---no need to call this
     if 9 > len(num) or len(num) > 10:
         return False
     else:
@@ -154,34 +141,22 @@ def resizeFrame(frame, fixed_height):
     return resized_frame
 
 def calculate_frequency(vector):
-    # Sort the vector in descending order according to the area
-    # if(len(vector)<5):
-    #     print("returning none")
-    #     return None
     sorted_vector = sorted(vector, key=lambda x: x[0], reverse=True)
-    
-    # Calculate the number of elements to consider (first 70%)
-    # num_elements = int(len(sorted_vector) * 0.7)
-    
-    # Extract numbers from the first 70% of elements
     numbers = [pair[1] for pair in sorted_vector]
 
-    a=0
-    filtered_vector=[]
+    freq10 = 0
+    filtered_vector = []
     for plate in numbers:
-        if len(plate)==10:
-            a=a+1
-    if a>=0.5*len(numbers):
+        if len(plate) == 10:
+            freq10 = freq10 + 1
+    if freq10 >= 0.5*len(numbers):
         filtered_vector = [plate for plate in numbers if len(plate) != 9]
     else:
-        filtered_vector = [plate for plate in numbers if len(plate) != 10]
-    
+        filtered_vector = [plate for plate in numbers if len(plate) != 10]    
     
     return filtered_vector
 
-
-
-def  rec(plates):
+def  select_number(plates):
     mp = [{} for _ in range(10)]
     n = len(plates)
     res = ""
@@ -196,13 +171,14 @@ def  rec(plates):
         res += ch
     return res
 
+def make_excel(wb):
+    temp_file = 'temp.xls'
+    wb.save(temp_file)
 
+    existing_file = 'xlwt example.xls'
+    if os.path.exists(existing_file):
+        os.remove(existing_file)
 
-def insert_number(boxes_ids, my_map, number):
-    for box_id in boxes_ids:
-        _, _, w, h, id = box_id
-        area = w*h
-        my_map[id].append((area, number))
-        
+    os.rename(temp_file, existing_file)
 
         
