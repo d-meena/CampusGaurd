@@ -8,7 +8,7 @@ import argparse
 from PIL import ImageEnhance
 from PIL import Image
 from track import *
-from helper import find_licensePlate, read_image, modify_no, resizeFrame, calculate_frequency, select_number, make_excel
+from helper import filterPlate, read_image, modify_no, resizeFrame, calculate_frequency, select_number, make_excel
 # 
 fixed_height = 600  # Set your desired height
 id_tracker = EuclideanDistTracker()
@@ -51,7 +51,7 @@ while True:
         plate_roi = frame[y:y+h, x:x+w]
         cv2.imshow('plate', plate_roi)
 
-        lisence_plate = find_licensePlate(plate_roi)
+        lisence_plate = filterPlate(plate_roi)
         number = read_image(lisence_plate, psm=7)
 
         if number is not None and number.strip() != "":

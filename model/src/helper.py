@@ -9,7 +9,7 @@ from PIL import ImageEnhance
 from PIL import Image
 from collections import Counter
 
-def find_licensePlate(plate_roi):
+def filterPlate(plate_roi):
     # Convert to grayscale
     gray_image = cv2.cvtColor(plate_roi, cv2.COLOR_BGR2GRAY)
 
@@ -177,7 +177,7 @@ def make_excel(wb):
 
     existing_file = 'xlwt example.xls'
     if os.path.exists(existing_file):
-        os.remove(existing_file)
+        os.remove(existing_file) 
 
     os.rename(temp_file, existing_file)
 
