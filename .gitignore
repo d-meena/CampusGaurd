@@ -4,4 +4,6 @@
 __pycache__
 Data
 env
-xlwt example.xls
+*.xls
+/model/src/excel_files
+/model/src/saved_images
