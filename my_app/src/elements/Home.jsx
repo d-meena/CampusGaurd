@@ -74,6 +74,8 @@ function Home() {
   }
 
   return (
+    <>
+    <div className="absolute h-screen w-full bg-home bg-cover bg-center bg-no-repeat -z-10"></div>
     <div className="text-center min-h-screen flex flex-col">
       <h1 className="text-4xl p-2">Campus Guard</h1>
       <p className="text-lg font-semibold p-2">Entry-Exit System for IITR</p>
@@ -121,6 +123,7 @@ function Home() {
         </>
       )}
     </div>
+    </>
   );
 }
 

@@ -12,7 +12,7 @@ const CustomButton = ({ onClick, type, children, customClasses }) => {
   }
   return (
     <button
-      className={`${typeStyle} ${customClasses} hover:shadow-xl border-none bg-slate-700 text-white cursor-pointer hover:bg-slate-600`}
+      className={`${typeStyle} ${customClasses} font-bold border-solid bg-slate-700 text-white bg-opacity-90 cursor-pointer hover:bg-slate-600 hover:shadow-2xl border-white border-2`}
       onClick={onClick}
     >
       {children}

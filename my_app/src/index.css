@@ -10,6 +10,10 @@
   box-sizing: border-box;
 }
 
+#root {
+  min-height: 100vh;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -21,4 +25,25 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+
+.active-page-number {
+  border: 1px solid black;
+  padding: 0.5rem;
+  border-radius: 50%;
+  background-color: rgb(51 65 85);
+  color: white;
+}
+
+.page-number:hover {
+  background-color: rgb(203 213 225);
+  color: black;
+  cursor: pointer;
+}
+
+.page-number {
+  border: 1px solid black;
+  padding: 0.5rem;
+  border-radius: 50%;
 }
